@@ -106,88 +106,33 @@ In addition to performing differential expression analysis of transcripts, the s
 
 ***NOTE:*** *Kallisto is distributed under a non-commercial license, while Sailfish and Salmon are distributed under the [GNU General Public License, version 3](http://www.gnu.org/licenses/gpl.html).*
 
+#### Set-up for Running Sleuth
 
-## Set-up for Running Sleuth on Orchestra
-
-While Sailfish and Sleuth are lightweight algorithms that can be quickly run on a laptop computer [[2](https://rawgit.com/pachterlab/sleuth/master/inst/doc/intro.html)], it is more efficient to run Sleuth on Orchestra. 
-
-### Setting up the filesystem
-
-Let's get started by setting up our directory. First let's copy over our meta data and the full sailfish output files. 
-
-```
-$ bsub -Is -R "rusage[mem=16000]" -q interactive bash
-
-$ cd ~/ngs_course/rnaseq
-
-$ cp /groups/hbctraining/ngs-data-analysisSummer2016/rnaseq/snapshots/meta/Mov10_full_meta.txt meta/
-
-$ cp -r /groups/hbctraining/ngs-data-analysisSummer2016/rnaseq/snapshots/sailfish/* sailfish/
-```
-
-Now let's make a folder for our sleuth results and load the R module to run it.
-
-```
-$ mkdir sleuth
-
-$ module load stats/R/3.2.1
-```
-
-Sleuth is an R package, and while some R packages are automatically available to us on Orchestra, some of the packages we need to run Sleuth are not. Therefore, to run Sleuth on Orchestra, we need to manually install these programs into our personal R library. If you haven't created a personal R library, you can do so by entering the following code ([Orchestra Wiki](https://wiki.med.harvard.edu/Orchestra/WebHome)):
-
-```
-$ mkdir -p ~/R/library
-
-$ echo 'R_LIBS_USER="~/R/library"' >  $HOME/.Renviron
-
-$ export R_LIBS_USER="/home/username/R/library"
-```
-
-Now, start R:
-
-```
-$ R
-```
-
-The terminal window should now turn into the R console with the R prompt `>`. 
-
-***NOTE:*** *Since we are not working in RStudio on Orchestra, we will not be able to readily view our environment or plots.*
-
-### Installing R packages
+While Sailfish and Sleuth are lightweight algorithms that can be quickly run on a laptop [[2](https://rawgit.com/pachterlab/sleuth/master/inst/doc/intro.html)], it is more efficient to run Sleuth in an HPC environment. 
 
 Since Sleuth was designed to use the output of Kallisto as input, our Sailfish transcript abundance estimates need to be massaged into the format of the Kallisto output. To do this, we are going to use the package [Wasabi](https://github.com/COMBINE-lab/wasabi). 
 
-To manually install a package on Orchestra from CRAN or Bioconductor, we can use the following code:
-
 ```
-# DO NOT RUN THIS
-
-# Install of CRAN packages
-install.packages("name-of-your-package", lib="~/R/library")
-
-# Install of Bioconductor packages
+# Installing packages
 source("http://bioconductor.org/biocLite.R")
-biocLite()
-biocLite("nameofpackage")
-```
+biocLite("rhdf5")
 
-Using this code, install the `Wasabi` package, which is a Bioconductor package.
+install.packages("devtools")
 
-```
+devtools::install_github("pachterlab/sleuth")
+
 source("http://bioconductor.org/biocLite.R")
 biocLite("COMBINE-lab/wasabi")
 
 # When asked whether you want to "Update all/some/none?" Select `n` for none.
 ```
 
-We have created an Rscript to run Wasabi and Sleuth for you, but to explain each step, we will run the commands interactively. In a new terminal, it may be helpful to have the script open to copy from.
-
 ### Setting up working directory and loading libraries
 
-Before starting, let's set our working directory to the `rnaseq` folder:
+Before starting, create a new folder "sleuth" and set our working directory to that:
 
 ```
-setwd("~/ngs_course/rnaseq")
+setwd("~/sleuth")
 ```
 and load the libraries for wasabi and sleuth, which is already installed on Orchestra. Sleuth also has a couple of dependencies and requires these other packages be loaded, as well: `biomaRt`, and `dplyr` (automatically available from Orchestra):
 
