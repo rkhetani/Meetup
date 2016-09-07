@@ -14,6 +14,7 @@ date: "September, 2016"
 
 In the standard RNA-seq pipeline that we have presented so far in this course, we have taken our reads post-QC and aligned them to the genome using our transcriptome (GTF) as guidance. The goal is to identify the genomic location where these reads originated from. Another strategy for quantification which has more recently been introduced involves **transcriptome mapping**. Tools that fall in this category include [Kallisto](https://pachterlab.github.io/kallisto/about), [Sailfish](http://www.nature.com/nbt/journal/v32/n5/full/nbt.2862.html) and [Salmon](https://combine-lab.github.io/salmon/); each working slightly different from one another. Common to all of these tools is that we **avoid mapping reads**, which is a time-consuming step, and **provides quantification estimates much faster than do existing approaches** (typically 20 times faster) without loss of accuracy. For this course we will explore Sailfish in more detail.
 
+## Sailfish
 
 ### What is Sailfish?
 
@@ -30,7 +31,7 @@ In the standard RNA-seq pipeline that we have presented so far in this course, w
 
 <img src="../img/nbt.2862-F1.jpg" width="400">
 
-## Running Sailfish
+### Running Sailfish
 
 As you can imagine from the above schematic, taken from [Patro R. et al, 2014](http://www.nature.com/nbt/journal/v32/n5/full/nbt.2862.html), there are 2 steps when running the analysis too:
 
@@ -58,7 +59,7 @@ To run the quantification step on a single sample we have the command provided b
     -o <name of output directory>
 ```
 
-## Sailfish output
+### Sailfish output
 
 You should see a new directory has been created that is named by the string value you provided in the `-o` command. 
     
@@ -84,13 +85,13 @@ ENST00000605284 17      8.69981 0       0
  
 ## Performing DE analysis on Pseudocounts
 
-### tximport + DESeq2
+## tximport + DESeq2
 
 The [tximport](https://www.bioconductor.org/packages/devel/bioc/html/tximport.html) package will convert Pseudocounts to values similar to raw count values, and combine transcript-level (splice isoforms) counts into gene-level counts. [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) has a function available that can use these counts (not whole numbers) as input to DESeq2. Today we are not going to talk about using either of these tools, but do explore the links and test it out.
 
-### Sleuth
+## Sleuth
 
-#### What is Sleuth?
+### What is Sleuth?
 
 [Sleuth](http://pachterlab.github.io/sleuth/) is a fast, lightweight tool that uses transcript abundance estimates output from pseudo-alignment algorithms that use bootstrap sampling, such as Sailfish, Salmon, and Kallisto, to perform differential expression analysis of transcripts. 
 
@@ -130,7 +131,7 @@ biocLite("biomaRt")
 # When asked whether you want to "Update all/some/none?" Select `n` for none.
 ```
 
-#### Setting up working directory and loading libraries
+### Setting up working directory and loading libraries
 
 Before starting, create a new folder "sleuth" and set our working directory to that:
 
@@ -150,7 +151,7 @@ Download the `.sf` files from the sailfish run to the sleuth directory and decom
 
 Also download the metadata file from [here](https://github.com/rkhetani/Meetup/raw/master/Mov10_full_meta.txt)
 
-## Using Wasabi to convert Sailfish output for Sleuth
+### Using Wasabi to convert Sailfish output for Sleuth
 
 Now that we are set-up and our packages are installed, we can use Wasabi to convert the Sailfish (or Salmon) output into a Sleuth-compatible format. 
 
@@ -171,7 +172,7 @@ prepare_fish_for_sleuth(sf_dirs)
 Each of the sample directories should now contain the `abundance.h5` files. These 
 files will be used as input to Sleuth.
 
-#### Sleuth for estimation of differential expression of transcripts
+### Sleuth for estimation of differential expression of transcripts
 
 To run Sleuth, we not only need the transcript abundance files, but we also need the metadata file specifying which samplegroups the samples belong to, and any other metadata we want included in the analysis. To analyze isoform-level differential expression with Sleuth, we need to perform a series of steps:
 
@@ -189,7 +190,7 @@ To run Sleuth, we not only need the transcript abundance files, but we also need
 
 5. Test for significant differences between conditions
 
-#### Step 1: Create a dataframe needed to generate Sleuth analysis object
+### Step 1: Create a dataframe needed to generate Sleuth analysis object
 
 *Read in the metadata file*
 
@@ -301,7 +302,7 @@ Now that we have all of the analyses performed, we need to bring the output to o
 save("oe", "summarydata", "sleuth_results_oe", file="oe.RData")
 ```
 
-#### Exploration of differential expression results
+### Exploration of differential expression results
 
 While we can explore our results manually, sleuth offers us the option to explore the data and results interactively using a web interface. 
 
