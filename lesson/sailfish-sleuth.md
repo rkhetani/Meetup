@@ -121,13 +121,16 @@ install.packages("devtools")
 
 devtools::install_github("pachterlab/sleuth")
 
+install.packages("dplyr")
+
 source("http://bioconductor.org/biocLite.R")
 biocLite("COMBINE-lab/wasabi")
+biocLite("biomaRt")
 
 # When asked whether you want to "Update all/some/none?" Select `n` for none.
 ```
 
-### Setting up working directory and loading libraries
+#### Setting up working directory and loading libraries
 
 Before starting, create a new folder "sleuth" and set our working directory to that:
 
