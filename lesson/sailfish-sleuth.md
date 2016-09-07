@@ -148,6 +148,8 @@ library(dplyr)
 
 Download the `.sf` files from the sailfish run to the sleuth directory and decompress it. [Click here to download sailfish.zip.](https://github.com/rkhetani/Meetup/raw/master/sailfish.zip)
 
+Also download the metadata file from [here](https://github.com/rkhetani/Meetup/raw/master/Mov10_full_meta.txt)
+
 ## Using Wasabi to convert Sailfish output for Sleuth
 
 Now that we are set-up and our packages are installed, we can use Wasabi to convert the Sailfish (or Salmon) output into a Sleuth-compatible format. 
