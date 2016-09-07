@@ -137,7 +137,7 @@ Before starting, create a new folder "sleuth" and set our working directory to t
 ```
 setwd("~/sleuth")
 ```
-and load the libraries for wasabi and sleuth, which is already installed on Orchestra. Sleuth also has a couple of dependencies and requires these other packages be loaded, as well: `biomaRt`, and `dplyr` (automatically available from Orchestra):
+Load the libraries for wasabi and sleuth, sleuth also has a couple of dependencies and requires these other packages be loaded, as well: `biomaRt`, and `dplyr`:
 
 ```
 library(wasabi)
@@ -146,22 +146,13 @@ library(biomaRt)
 library(dplyr)
 ```
 
+Download the `.sf` files from the sailfish run to the sleuth directory and decompress it. [Click here to download sailfish.zip.](https://github.com/rkhetani/Meetup/raw/master/sailfish.zip)
+
 ## Using Wasabi to convert Sailfish output for Sleuth
 
 Now that we are set-up and our packages are installed, we can use Wasabi to convert the Sailfish (or Salmon) output into a Sleuth-compatible format. 
 
-First, we create a simple vector containing the paths to the directories containing the transcript abundance estimates for each sample (folders containing the .quant files). We can use the `file.path()` function to give the paths to each of the directories. It works as follows:
-
-```
-# DO NOT RUN THIS
-path <- file.path("path", "to", c("directory1", "directory2")
-
-head(path)
-
-"path/to/directory1", "path/to/directory2"
-```
-
-Now, let's use this function to create our list of the paths to our transcript abundance files:
+First, we create a simple vector containing the paths to the directories containing the transcript abundance estimates for each sample (folders containing the .quant files). We can use the `file.path()` function to give the paths to each of the directories to create our list of the paths to our transcript abundance files:
 
 ```
 sf_dirs <- file.path("sailfish", c("Mov10_kd_2.sailfish", "Mov10_kd_3.sailfish", "Mov10_oe_1.sailfish", "Mov10_oe_2.sailfish", "Mov10_oe_3.sailfish","Irrel_kd_1.sailfish", "Irrel_kd_2.sailfish", "Irrel_kd_3.sailfish"))
