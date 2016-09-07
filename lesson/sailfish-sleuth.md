@@ -43,7 +43,7 @@ a. "Index" the transcriptome (transcripts or genes) using the `index` command:
 b. Get the abundance using the quantification step using the `quant` command and the parameters described below (more information on parameters can be found [here](http://sailfish.readthedocs.org/en/master/sailfish.html#description-of-important-options):
 
 
-   * `i`: specify the location of the index directory; for us it is `/groups/hbctraining/ngs-data-analysisSummer2016/rnaseq/sailfish.ensembl2.idx/`
+   * `i`: specify the location of the index directory
    * `-l SR`: specify stranded single-end reads
    * `-r`: list of files
    * `--useVBOpt`: use variational Bayesian EM algorithm rather than the ‘standard EM’ to optimize abundance estimates (more accurate) 
@@ -267,7 +267,7 @@ so <- sleuth_prep(sfdata, design, target_mapping = t2g)
 
 so <- sleuth_fit(so)
 
-# NOTE: alternatively the two prior steps could have been run as: "so <- sleuth_prep(sfdata, design, target_mapping = t2g) %>% sleuth_fit()
+# NOTE: alternatively the two prior steps could have been run as: "so <- sleuth_prep(sfdata, design, target_mapping = t2g) %>% sleuth_fit()"
 
 ```
 
