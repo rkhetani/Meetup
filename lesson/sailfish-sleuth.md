@@ -155,7 +155,7 @@ Now that we are set-up and our packages are installed, we can use Wasabi to conv
 First, we create a simple vector containing the paths to the directories containing the transcript abundance estimates for each sample (folders containing the .quant files). We can use the `file.path()` function to give the paths to each of the directories to create our list of the paths to our transcript abundance files:
 
 ```
-sf_dirs <- file.path("sailfish", c("Mov10_kd_2.sailfish", "Mov10_kd_3.sailfish", "Mov10_oe_1.sailfish", "Mov10_oe_2.sailfish", "Mov10_oe_3.sailfish","Irrel_kd_1.sailfish", "Irrel_kd_2.sailfish", "Irrel_kd_3.sailfish"))
+sf_dirs <- file.path("sailfish", c("Mov10_oe_1", "Mov10_oe_2", "Mov10_oe_3","Irrel_kd_1", "Irrel_kd_2", "Irrel_kd_3"))
 
 sf_dirs
 ```
