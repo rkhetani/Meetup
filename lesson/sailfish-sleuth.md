@@ -198,7 +198,7 @@ Read in the metadata file and use the `data.frame()` function to ensure it is a 
 ```
 # Read in metadata file
 
-summarydata <- data.frame(read.table("meta/Mov10_full_meta.txt", header=TRUE, row.names=1), check.rows=FALSE)
+summarydata <- data.frame(read.table("Mov10_full_meta.txt", header=TRUE, row.names=1), check.rows=FALSE)
 
 
 ```
