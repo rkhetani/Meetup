@@ -136,7 +136,7 @@ biocLite("biomaRt")
 Before starting, create a new folder "sleuth" and set our working directory to that:
 
 ```
-setwd("~/sleuth")
+setwd("~/Desktop/sleuth")
 ```
 Load the libraries for wasabi and sleuth, sleuth also has a couple of dependencies and requires these other packages be loaded, as well: `biomaRt`, and `dplyr`:
 
