@@ -107,7 +107,7 @@ In addition to performing differential expression analysis of transcripts, the s
 
 ***NOTE:*** *Kallisto is distributed under a non-commercial license, while Sailfish and Salmon are distributed under the [GNU General Public License, version 3](http://www.gnu.org/licenses/gpl.html).*
 
-#### Set-up for Running Sleuth
+### Set-up for Running Sleuth
 
 While Sailfish and Sleuth are lightweight algorithms that can be quickly run on a laptop [[2](https://rawgit.com/pachterlab/sleuth/master/inst/doc/intro.html)], it is more efficient to run Sleuth in an HPC environment. 
 
