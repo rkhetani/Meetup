@@ -32,30 +32,14 @@ In the standard RNA-seq pipeline that we have presented so far in this course, w
 
 ## Running Sailfish
 
-> These instructions are for the HMS-RC cluster Orchestra
-
-First start an interactive session and create a new directory for our Sailfish analysis:
-
-    $ bsub -Is -q interactive bash
-
-    $ mkdir ~/ngs_course/rnaseq/sailfish
-    $ cd ~/ngs_course/rnaseq/sailfish
-    
-Sailfish is not available as a module on Orchestra, but it is installed as part of the bcbio pipeline. As such, if we include the appropriate paths in our `$PATH` variable we can use it:
-    
-    $ export PATH=/opt/bcbio/centos/bin:$PATH
-    
 As you can imagine from the above schematic, taken from [Patro R. et al, 2014](http://www.nature.com/nbt/journal/v32/n5/full/nbt.2862.html), there are 2 steps when running the analysis too:
 
 a. "Index" the transcriptome (transcripts or genes) using the `index` command:
     
-    ## DO NOT RUN THIS CODE
     $ sailfish index -p <num of cores> -k <kmer size> -t <fasta of gene sequences> 
                          -o <folder name>
 
-**We are not going to run this in class, but it only takes a few minutes.** We will be using an index we have generated from transcript sequences (all known transcripts with multiples for some genes), but this can be generated from genic sequences too. 
-
-b. Get the abundance using the quantification step using the `quant` command and the parameters described below (morE information on parameters can be found [here](http://sailfish.readthedocs.org/en/master/sailfish.html#description-of-important-options):
+b. Get the abundance using the quantification step using the `quant` command and the parameters described below (more information on parameters can be found [here](http://sailfish.readthedocs.org/en/master/sailfish.html#description-of-important-options):
 
 
    * `i`: specify the location of the index directory; for us it is `/groups/hbctraining/ngs-data-analysisSummer2016/rnaseq/sailfish.ensembl2.idx/`
@@ -67,18 +51,16 @@ b. Get the abundance using the quantification step using the `quant` command and
 To run the quantification step on a single sample we have the command provided below. Let's try running it on our susbet sample for `Mov10_oe_1.subset.fq`:
 
 ``` 
-    $ sailfish quant -i /groups/hbctraining/ngs-data-analysisSummer2016/rnaseq/sailfish.ensembl2.idx/ \
+    $ sailfish quant -i <index> \
     -l SR \
-    -r ~/ngs_course/rnaseq/data/untrimmed_fastq/Mov10_oe_1.subset.fq \
+    -r <fastq> \
     --useVBOpt \
-    -o Mov10_oe_1.subset.sailfish
+    -o <name of output directory>
 ```
 
 ## Sailfish output
 
-You should see a new directory has been created that is named by the string value you provided in the `-o` command. Take a look at what is contained in this directory:
-
-    $ ls -l Mov10_oe_1.subset.sailfish/
+You should see a new directory has been created that is named by the string value you provided in the `-o` command. 
     
 There is a logs directory, which contains all of the text that was printed to screen as Sailfish was running. Additionally, there is a file called `quant.sf`. This is the quantification file in which each row corresponds to a transcript, listed by Ensembl ID, and the columns correspond to metrics for each transcript:
 
@@ -96,12 +78,19 @@ ENST00000605284 17      8.69981 0       0
 
 ```
 
- The first two columns are self-explanatory, the name of the transcript and the length of the transcript in base pairs (bp). The effective length is represents, <enter definition here> and is used in computing the TPM value. The TPM, or Transcripts per Million is a normalization method as described in [1](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2820677/), and is meant as an estimate of the number of transcripts, per million observed transcripts, originating from each isoform. It's benefit over the F/RPKM measure is that it is independent of the mean expressed transcript length. The NumReads column lists the total number of reads that were counted for that transcript.
+ The first two columns are self-explanatory, the name of the transcript and the length of the transcript in base pairs (bp). 
+ The effective length represents the the various factors that effect the length of transcript due to technical limitations of the sequencing platform. It is used in computing the TPM value. 
+ The TPM, or Transcripts per Million is a normalization method as described in [1](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2820677/), and is meant as an estimate of the number of transcripts, per million observed transcripts, originating from each isoform. It's benefit over the F/RPKM measure is that it is independent of the mean expressed transcript length. The NumReads column lists the total number of reads that were counted for that transcript.
  
 ## Performing DE analysis on Pseudocounts
 
+### tximport + DESeq2
 
-### What is Sleuth?
+The [tximport](https://www.bioconductor.org/packages/devel/bioc/html/tximport.html) package will convert Pseudocounts to values similar to raw count values, and combine transcript-level (splice isoforms) counts into gene-level counts. [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) has a function available that can use these counts (not whole numbers) as input to DESeq2. Today we are not going to talk about using either of these tools, but do explore the links and test it out.
+
+### Sleuth
+
+#### What is Sleuth?
 
 [Sleuth](http://pachterlab.github.io/sleuth/) is a fast, lightweight tool that uses transcript abundance estimates output from pseudo-alignment algorithms that use bootstrap sampling, such as Sailfish, Salmon, and Kallisto, to perform differential expression analysis of transcripts. 
 
@@ -116,7 +105,6 @@ Sleuth was built to use the bootstrapped estimates of transcript abundance from 
 In addition to performing differential expression analysis of transcripts, the sleuth tool also provides an html interface allowing exploration of the data and differential expression results interactively. More information about the theory/process for sleuth is available in [this blogpost](https://liorpachter.wordpress.com/2015/08/17/a-sleuth-for-rna-seq/) and step-by-step instructions are available in [this tutorial](https://rawgit.com/pachterlab/sleuth/master/inst/doc/intro.html).
 
 ***NOTE:*** *Kallisto is distributed under a non-commercial license, while Sailfish and Salmon are distributed under the [GNU General Public License, version 3](http://www.gnu.org/licenses/gpl.html).*
-
 
 
 ## Set-up for Running Sleuth on Orchestra
