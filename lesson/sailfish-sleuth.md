@@ -171,7 +171,7 @@ prepare_fish_for_sleuth(sf_dirs)
 Each of the sample directories should now contain the `abundance.h5` files. These 
 files will be used as input to Sleuth.
 
-## Sleuth for estimation of differential expression of transcripts
+#### Sleuth for estimation of differential expression of transcripts
 
 To run Sleuth, we not only need the transcript abundance files, but we also need the metadata file specifying which samplegroups the samples belong to, and any other metadata we want included in the analysis. To analyze isoform-level differential expression with Sleuth, we need to perform a series of steps:
 
@@ -189,9 +189,9 @@ To run Sleuth, we not only need the transcript abundance files, but we also need
 
 5. Test for significant differences between conditions
 
-### Step 1: Create a dataframe needed to generate Sleuth analysis object
+#### Step 1: Create a dataframe needed to generate Sleuth analysis object
 
-#### Read in the metadata file 
+*Read in the metadata file*
 
 Read in the metadata file and use the `data.frame()` function to ensure it is a dataframe:
 
@@ -226,14 +226,6 @@ sfdata
 ### Step 2: Provide the model design
 
 Determine the covariates and/or confounders that should be included in your experimental design model. Sleuth can be used to analyze multiple conditions from complex experimental designs.
-
-Within Sleuth, models are written similar to DESeq2 using the following syntax:
-
-```
-# DO NOT RUN
-design <- ~ sex + treatment
-```
-This formula would test for the overall effect of treatment controlling for differences due to sex. The condition being tested is the last term added to the formula. 
 
 More complex designs can be analyzed using Sleuth as well. For example, interaction terms can be added to the design formula to test if the effect attributable to a given condition is different based on another factor, for example, if the treatment effect differs
 between sexes. To learn more about setting up design formulas for more complex designs, see the [DESeq2 tutorial](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.pdf) (chapter 3 discusses complex experimental designs). There is also a [recent post](http://nxn.se/post/134227694720/timecourse-analysis-with-sleuth) describing the use of Sleuth to perform time course analyses. While Sleuth has much flexiblity in design models, it is unable to support some complex designs, such as nested models.
@@ -287,11 +279,6 @@ Ensure the design model and coefficients are correct for your analysis.
 ```
 models(so)
 ```
-> **NOTE:** Sleuth will automatically use the first level (alphabetically) in the factor variable being tested to compare all other conditions against (in our metadata, this is 'control'). If you want to use a different condition to be the base level, then you would need to use the relevel() function to change the base level of the variable in step 1 above. For example, if we wanted the base level of `sampletype` to be "MOV10_knockdown", we could use the following code:
->```
-> summarydata$sampletype <- relevel(summarydata$sampletype, ref = "MOV10_knockdown")
->```
->***An ordered factor will not give interpretable output, so do not order the factor using the factor() function, use relevel() instead.***
 
 
 ### Step 5: Test significant differences between conditions using the Wald test
@@ -311,141 +298,10 @@ sleuth_results_oe <- sleuth_results(oe, 'sampletypeMOV10_overexpression', show_a
 Now that we have all of the analyses performed, we need to bring the output to our local machines for further exploration. The `save()` function works to write an R object to file, and takes the files to include in the R object as arguments.
 
 ```
-save("oe", "summarydata", "sleuth_results_oe", file="sleuth/oe.RData")
+save("oe", "summarydata", "sleuth_results_oe", file="oe.RData")
 ```
 
-## Exploration of differential expression results
-
-### Set-up for R session
-Before we begin to explore our results, we need to copy over the `oe.RData` file to our local machine using Filezilla or `scp`.
-
-If using `scp`, you need to open the Terminal on the local machine and type:
-
-```
-$ scp username@transfer.orchestra.med.harvard.edu:/home/username/ngs_course/rnaseq/sleuth/oe.RData Desktop
-```
-While the R object is transferring (it may take a few minutes), open up RStudio and create a new project called `sleuth`. 
-
-Within RStudio we need to install and load Sleuth similar to what we did on Orchestra:
-
-```
-# Install the sleuth package on your local machine
-
-source("http://bioconductor.org/biocLite.R")
-biocLite("devtools")    # only if devtools not yet installed
-biocLite("pachterlab/sleuth")
-
-# Load the sleuth library
-
-library(sleuth)
-```
-
-After the R object has successfully transferred, you can load the object into your new R project using `load()` or by double-clicking on the `oe.RData` object in the RStudio file directory:
-
-```
-load("~/Desktop/oe.RData")
-```
-
-Move `oe.RData` into the `sleuth` folder.
-
-### Exploring transcript-level expression between samples
-
-Now that we have our environment set up, we can perform some exploratory analyses. 
-
-#### Visualization of transcript expression for a single Mov10 isoform
-
-Let's get the transcript expression values for Mov10 transcript "ENST00000357443". We would like to observe technical and biological variation between the samples, so we need to attain the expression estimates for each bootstrap sampling for every sample using the `get_bootstraps()` function in sleuth:
-
-```
-boot_mov10_443 <- get_bootstraps(oe, "ENST00000357443")
-```
-
-If we view `boot_mov10_443`, we will see the estimated counts (est_counts) and Transcripts Per Million (tpm) values for each bootstrap of every sample. We can visualize the estimates and distributions:
-
-```
-ggplot(boot_mov10_443, aes(sample, est_counts + 1, fill = sampletype)) + 
-        geom_boxplot() + 
-        facet_wrap(~target_id, ncol = 1) + 
-        theme_bw() + 
-        scale_y_log10() + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-        ylab("estimated counts") + 
-        xlab("")
-```
-
-The technical variation associated with the transcript abundance estimates for each sample is represented by the box plots. The biological variation is observed by viewing across biological replicates.
-
-While this isoform of Mov10 shows the expected pattern of expression, with high expression in the Mov10 over-expressed samples and lower expression in the Mov10 knockdown samples. We can look at the other isoforms of Mov10 as well. 
-
-To get the transcript IDs of all Mov10 transcripts, we can subset the dataset to those rows with gene names of "MOV10" and only return the transcript IDs. We can use the `drop` argument to return a vector instead of a dataframe:
-
-```
-mov10 <- subset(sleuth_results_oe, ext_gene == "MOV10", select=target_id, drop=T)
-```
-
-Now we would like to get the bootstraps for each transcript in this `mov10` vector. The easiest way to do this is using a `for loop`. 
-
-#### For loops in R
-
-"For loops" in R are very similar to using the command line, and follow the syntax:
-
-```
-# DO NOT RUN
-
-for (variable in list){
-    commands
-}
-```
-You can think of the `{` as `do` and `}` as `done` in the command line. For example, we can list the names of each transcript in the `mov10` vector as follows:
-
-```
-for (transcript in mov10){
-    print(paste("The transcript ID is", transcript))
-}
-```
-You can issue as many commands as you wish inside the "for loop". 
-
-#### Visualization of transcript expression for all Mov10 isoforms  
-
-Now that we know how a "for loop" works in R, let's run `get_bootstraps()` on each mov10 transcript and save the output of each iteration in a file, `df`:
-
-```
-# Create dataframe to add transcript abundance estimates to
-
-df <- data.frame()
-
-# Get bootstraps for each transcript of Mov10
-
-for(transcript in mov10){
-    df <-rbind(df, get_bootstraps(oe, transcript))
-}
-```
-
-> NOTE: 'For loops' in R are often not the most efficient way to perform complex operations. Often try to find a different function to use in place of using a 'for loop', such as a function in the `apply` family. A blog post explaining how to avoid 'for loops' in R is [available](http://www.r-bloggers.com/for-loops-and-how-to-avoid-them/). We performed a simple 'for loop', so it was pretty straight-forward, but we could have performed the same operation using the following code:
-
-```
-# DO NOT RUN
-bootstraps <- lapply(mov10 , function(x){get_bootstraps(so, x)})
-df <- do.call(rbind, bootstraps)
-```
-
-Similar to the single Mov10 isoform, we can plot the estimates and distributions for all isoforms of Mov10 as follows:
-
-```
-ggplot(df, aes(sample, est_counts + 1, fill = sampletype)) + 
-        geom_boxplot() + 
-        facet_wrap(~target_id, ncol = 1) + 
-        theme_bw() + scale_y_log10() + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-        ylab("estimated counts") + 
-        xlab("")
-```
-
-This plot is difficult to see in the "Plots" window. Let's export the image as a PNG using the setting displayed below:
-
-![mov10_isoforms](../img/mov10_isoform_png.png)
-
-Click on the "Plots" tab, and click on the "Export" drop-down menu. Choose "Save as image". In the "Save plot as image" window, the image format should be PNG, the file name should be "Mov10_isoform_expression.png". The box should be checked for "Maintain aspect ratio", and the "Height" should be "2000". 
+#### Exploration of differential expression results
 
 While we can explore our results manually, sleuth offers us the option to explore the data and results interactively using a web interface. 
 
