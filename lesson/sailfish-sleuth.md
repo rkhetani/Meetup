@@ -190,6 +190,7 @@ To run Sleuth, we not only need the transcript abundance files, but we also need
 
 5. Test for significant differences between conditions
 
+
 ### Step 1: Create a dataframe needed to generate Sleuth analysis object
 
 *Read in the metadata file*
@@ -201,10 +202,7 @@ Read in the metadata file and use the `data.frame()` function to ensure it is a 
 
 summarydata <- data.frame(read.table("Mov10_full_meta.txt", header=TRUE, row.names=1), check.rows=FALSE)
 
-
 ```
-#### Create dataframe to be used to generate the sleuth analysis object
-
 Now, combine the metadata with the paths to the transcript abundance files to use as input for the Sleuth analysis. Sleuth expects the data to be presented in a specific format with specific column and row names; therefore, we will create the dataframe based on the sleuth requirements for analysis.
 
 ```
